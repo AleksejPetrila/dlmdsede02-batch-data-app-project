@@ -1,0 +1,51 @@
+services:
+  namenode:
+    image: apache/hadoop:3.3.5
+    container_name: namenode
+    hostname: namenode
+    user: root
+    environment:
+      - HADOOP_HOME=/opt/hadoop
+    volumes:
+      - ./hadoop_namenode:/opt/hadoop/data/nameNode
+      - ./hadoop_config:/opt/hadoop/etc/hadoop
+      - ./start-hdfs.sh:/start-hdfs.sh
+    command: [ "/bin/bash", "/start-hdfs.sh" ]
+    networks:
+      - hadoop
+
+  datanode1:
+    image: apache/hadoop:3.3.5
+    container_name: datanode1
+    hostname: datanode1
+    user: root
+    environment:
+      - HADOOP_HOME=/opt/hadoop
+    volumes:
+      - ./hadoop_datanode1:/opt/hadoop/data/dataNode
+      - ./hadoop_config:/opt/hadoop/etc/hadoop
+      - ./init-datanode.sh:/init-datanode.sh
+    depends_on:
+      - namenode
+    command: [ "/bin/bash", "/init-datanode.sh" ]
+    networks:
+      - hadoop
+
+  spark:
+    build:
+      context: .
+      dockerfile: Dockerfile.spark
+    container_name: spark
+    hostname: spark
+    depends_on:
+      - namenode
+      - datanode1
+    volumes:
+      - .:/opt/spark-app
+    entrypoint: [ "/opt/spark/bin/spark-submit", "/opt/spark-app/main.py" ]
+    networks:
+      - hadoop
+
+networks:
+  hadoop:
+    driver: bridge

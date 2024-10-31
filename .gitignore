@@ -1,0 +1,35 @@
+# Python related files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+*.egg
+*.whl
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# PyCharm (I used PyCharm as an IDE)
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Docker
+*.log
+.docker/
+.dockerignore
+
+# System files (because I worked on a Windows machine)
+Thumbs.db
+ehthumbs.db
+*.tmp
+
+# Spark related
+spark-warehouse/
