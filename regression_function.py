@@ -1,30 +1,20 @@
 """
-This module starts the Spark session, then takes the cleaned data from clean_data.py module and creates a very simple
-machine learning model. The model creates a simple linear regression for 'Teens' age category, where the quantity of
-purchased products is based solely on product's price. Root mean squared error is used. as a measure of model accuracy.
-After creating the model, the app places it in the data -> models directory. The app also creates a test file that shows
-regression equation coefficient, intercept and root mean squared error.
+This module takes the cleaned data from clean_data.py module and creates a very simple machine learning model.
+The model creates a simple linear regression for 'Teens' age category, where the quantity of purchased products is
+based solely on product's price. Root mean squared error, R2 and variance are used. as a measure of model accuracy.
+After creating the model, the app places it in the data -> models directory. The app also creates a text file that shows
+regression equation coefficient, intercept, r2, variance and root mean squared error.
 If any model data or text file are present in the directory, they get overwritten.
-After regression the spark session stops and app finishes work and stops the relevant container.
+
+The Spark session for this module is started and finished in the ml_model.py module.
 """
-from pyspark.sql import SparkSession
 from pyspark.ml.feature import VectorAssembler
 from pyspark.ml.regression import LinearRegression
 from pyspark.ml.evaluation import RegressionEvaluator
 from paths import HDFS_CLEANED_PATH, MODEL_PATH, COEFFICIENT_PATH
 
 
-def linear_regression_price_total_age():
-
-    try:
-        print("Starting Spark session for regression analysis")
-        spark = SparkSession.builder \
-            .appName("LinearRegressionByAgeGroup") \
-            .getOrCreate()
-        print("Spark session for regression analysis started.")
-    except Exception as e:
-        print(f"Error with Starting Spark session for regression analysis: {e}")
-        return
+def linear_regression_price_total_age(spark):
 
     try:
         print(f"Loading clean data from {HDFS_CLEANED_PATH}.")
@@ -124,9 +114,3 @@ def linear_regression_price_total_age():
         print(f"Error with creating a text file with a coefficient, intercept and RMSE: {e}")
         spark.stop()
         return
-
-    try:
-        spark.stop()
-        print("Spark session for regression analysis finished.")
-    except Exception as e:
-        print(f"Error with finishing stopping Spark session for regression analysis: {e}")

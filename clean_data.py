@@ -1,25 +1,15 @@
 """
-This module starts the Spark session, then takes the data that was ingested into HDFS in ingest_data.py module
-and does data cleaning: the records with missing values are removed, as well as the duplicates.
+This module takes the data that was ingested into HDFS in ingest_data.py module and does data cleaning:
+the records with missing values are removed, as well as the duplicates.
 The cleaned data is then put into another HDFS directory for cleaned data.
 If any data is present there it gets overwritten.
-After cleansing the spark session stops.
+
+The Spark session for this module is started and finished in the data_processing.py module.
 """
-from pyspark.sql import SparkSession
 from paths import HDFS_INGESTED_PATH, HDFS_CLEANED_PATH
 
 
-def clean_data():
-
-    try:
-        print("Starting Spark session for cleansing")
-        spark = SparkSession.builder \
-            .appName("DataCleaning") \
-            .getOrCreate()
-        print("Spark session for cleansing started successfully.")
-    except Exception as e:
-        print(f"Error with starting Spark session for cleansing: {e}")
-        return
+def clean_data(spark):
 
     try:
         print(f"Reading ingested data from HDFS at {HDFS_INGESTED_PATH}...")
@@ -51,9 +41,3 @@ def clean_data():
         print(f"Error with writing cleaned data to HDFS: {e}")
         spark.stop()
         return
-
-    try:
-        spark.stop()
-        print("Spark session for cleansing finished.")
-    except Exception as e:
-        print(f"Error with finishing stopping Spark session for cleansing: {e}")

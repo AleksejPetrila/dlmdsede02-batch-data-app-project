@@ -1,3 +1,4 @@
+version: '3'
 services:
   namenode:
     image: apache/hadoop:3.3.5
@@ -31,18 +32,33 @@ services:
     networks:
       - hadoop
 
-  spark:
+  dataprocessing:
     build:
       context: .
       dockerfile: Dockerfile.spark
-    container_name: spark
-    hostname: spark
+    container_name: dataprocessing
+    hostname: dataprocessing
     depends_on:
       - namenode
       - datanode1
     volumes:
       - .:/opt/spark-app
-    entrypoint: [ "/opt/spark/bin/spark-submit", "/opt/spark-app/main.py" ]
+    entrypoint: [ "/opt/spark/bin/spark-submit", "/opt/spark-app/data_processing.py" ]
+    networks:
+      - hadoop
+
+  mlmodel:
+    build:
+      context: .
+      dockerfile: Dockerfile.spark
+    container_name: mlmodel
+    hostname: mlmodel
+    depends_on:
+      - datanode1
+      - dataprocessing
+    volumes:
+      - .:/opt/spark-app
+    entrypoint: [ "sh", "-c", "sleep 60 && /opt/spark/bin/spark-submit /opt/spark-app/ml_model.py" ]
     networks:
       - hadoop
 
